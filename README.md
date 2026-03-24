@@ -42,11 +42,19 @@ farm-erp-web/
 │   ├── contexts/        # React contexts (Auth, etc.)
 │   ├── features/        # Feature modules (future)
 │   ├── hooks/           # Custom React hooks (future)
-│   ├── lib/             # Utilities & Firebase config
+│   ├── lib/             # Utilities & Data layer
+│   │   ├── config.ts    # App configuration
+│   │   ├── dataProvider.ts  # Data abstraction layer
 │   │   ├── firebase.ts  # Firebase initialization
 │   │   ├── firestore.ts # Firestore helpers
 │   │   ├── auth.ts      # Auth helpers
-│   │   └── utils.ts     # General utilities
+│   │   ├── storage.ts   # Storage helpers
+│   │   ├── utils.ts     # General utilities
+│   │   └── mock/        # Mock data services
+│   │       ├── data.ts  # Sample data
+│   │       ├── mockAuth.ts
+│   │       ├── mockFirestore.ts
+│   │       └── mockStorage.ts
 │   ├── pages/           # Page components
 │   │   ├── auth/        # Login & authentication
 │   │   ├── dashboard/   # Dashboard
@@ -60,17 +68,39 @@ farm-erp-web/
 ├── public/              # Static assets
 ├── .env.local           # Environment variables (not committed)
 ├── .env.example         # Environment variables template
+├── firebase.json        # Firebase configuration
+├── .firebaserc          # Firebase project aliases
+├── firestore.rules      # Firestore security rules
+├── firestore.indexes.json # Firestore indexes
+├── storage.rules        # Cloud Storage security rules
 ├── FIREBASE_SETUP.md    # Firebase setup instructions
+├── MOCK_DATA_GUIDE.md   # Mock data development guide
+├── DEPLOYMENT.md        # Deployment guide
 └── README.md            # This file
 ```
+
+## 🚀 Quick Start (Mock Data Mode)
+
+Want to start developing immediately without Firebase setup? Use **Mock Data Mode**:
+
+```bash
+npm install
+npm run dev
+```
+
+The app runs with realistic sample data - no Firebase required! Login with any phone number and OTP code `123456`.
+
+See [MOCK_DATA_GUIDE.md](./MOCK_DATA_GUIDE.md) for details.
+
+---
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+ and npm
-- A Firebase account (free tier works)
 - A code editor (VS Code recommended)
+- **Optional:** A Firebase account (only needed when not using mock data)
 
 ### Installation
 
@@ -123,12 +153,60 @@ npm run preview
 
 ## Development
 
+### Development Modes
+
+The app supports three development modes:
+
+#### 🧪 Mock Data Mode (Default)
+- Perfect for development without Firebase
+- Uses realistic in-memory sample data
+- Login with OTP code: `123456`
+- No setup required!
+
+**Enable:**
+```env
+# .env.local
+VITE_USE_MOCK_DATA=true
+```
+
+#### 🔥 Firebase Production Mode
+- Uses real Firebase services
+- Data persists in Firestore
+- Real SMS OTP for authentication
+
+**Enable:**
+```env
+# .env.local
+VITE_USE_MOCK_DATA=false
+```
+
+#### 🛠️ Firebase Emulator Mode
+- Uses Firebase emulators locally
+- Data persists during emulator session
+- No cloud costs
+
+**Enable:**
+```env
+# .env.local
+VITE_USE_MOCK_DATA=false
+VITE_USE_FIREBASE_EMULATORS=true
+```
+
+Then run: `npm run emulators`
+
+See [MOCK_DATA_GUIDE.md](./MOCK_DATA_GUIDE.md) for complete details.
+
 ### Available Scripts
 
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint
+- `npm run deploy` - Build and deploy everything to Firebase
+- `npm run deploy:hosting` - Deploy only the web app
+- `npm run deploy:rules` - Deploy only Firestore and Storage rules
+- `npm run deploy:firestore` - Deploy Firestore rules and indexes
+- `npm run emulators` - Start Firebase emulators for local testing
 
 ### Code Style
 
@@ -228,32 +306,45 @@ This is an MVP project for a specific farm operation. If you're part of the team
 
 ## Deployment
 
-### Firebase Hosting
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions.
 
-1. Install Firebase CLI:
+### Quick Deploy
+
+1. **Install Firebase CLI:**
    ```bash
    npm install -g firebase-tools
-   ```
-
-2. Login to Firebase:
-   ```bash
    firebase login
    ```
 
-3. Initialize hosting:
+2. **Deploy everything:**
    ```bash
-   firebase init hosting
+   npm run deploy
    ```
 
-4. Build and deploy:
+3. **Deploy only hosting:**
    ```bash
-   npm run build
-   firebase deploy --only hosting
+   npm run deploy:hosting
    ```
+
+4. **Deploy only security rules:**
+   ```bash
+   npm run deploy:rules
+   ```
+
+### Firebase Configuration Files
+
+The following files define your Firebase security and are version-controlled:
+
+- **`firestore.rules`** - Database security rules with role-based access
+- **`firestore.indexes.json`** - Composite indexes for complex queries
+- **`storage.rules`** - File storage security rules
+- **`firebase.json`** - Main Firebase configuration
+
+These files are automatically deployed when you run `npm run deploy`.
 
 ### Custom Domain
 
-Configure your custom domain (e.g., `app.yourdomain.com`) in the Firebase Console under Hosting settings.
+Configure your custom domain (e.g., `app.yourdomain.com`) in the Firebase Console under Hosting settings. See [DEPLOYMENT.md](./DEPLOYMENT.md) for details.
 
 ## Troubleshooting
 
@@ -276,10 +367,21 @@ Configure your custom domain (e.g., `app.yourdomain.com`) in the Firebase Consol
 
 ## Next Steps
 
+### Option 1: Start with Mock Data (Recommended for Quick Start)
+
+1. **Install dependencies** - `npm install`
+2. **Start development** - `npm run dev`
+3. **Login** - Use OTP code `123456`
+4. **Build features** - Start developing immediately!
+
+See [MOCK_DATA_GUIDE.md](./MOCK_DATA_GUIDE.md) for details.
+
+### Option 2: Set up Real Firebase
+
 1. **Set up Firebase** - Follow [FIREBASE_SETUP.md](./FIREBASE_SETUP.md)
 2. **Configure environment variables** - Fill in `.env.local`
-3. **Start development** - Run `npm run dev`
-4. **Build features** - Start with inventory management
+3. **Disable mock mode** - Set `VITE_USE_MOCK_DATA=false`
+4. **Start development** - Run `npm run dev`
 
 ## Support
 

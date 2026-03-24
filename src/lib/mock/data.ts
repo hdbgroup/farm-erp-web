@@ -1,0 +1,495 @@
+import type {
+  User,
+  InventoryItem,
+  Zone,
+  Order,
+  Customer,
+  ActivityLog,
+  Notification,
+  StageTransition,
+} from '@/types'
+
+/**
+ * Mock Data for Development
+ *
+ * This file contains realistic sample data that mimics your production database.
+ * Use this for development when Firebase services aren't available.
+ */
+
+// Mock Users
+export const mockUsers: User[] = [
+  {
+    id: 'user-admin-001',
+    phoneNumber: '+15551234567',
+    name: 'John Smith',
+    role: 'admin',
+    email: 'john@farmexample.com',
+    createdAt: new Date('2024-01-15'),
+    updatedAt: new Date('2024-03-20'),
+  },
+  {
+    id: 'user-worker-001',
+    phoneNumber: '+15551234568',
+    name: 'Maria Garcia',
+    role: 'farm_worker',
+    email: 'maria@farmexample.com',
+    createdAt: new Date('2024-02-01'),
+    updatedAt: new Date('2024-03-15'),
+  },
+  {
+    id: 'user-manager-001',
+    phoneNumber: '+15551234569',
+    name: 'David Chen',
+    role: 'inventory_manager',
+    email: 'david@farmexample.com',
+    createdAt: new Date('2024-01-20'),
+    updatedAt: new Date('2024-03-18'),
+  },
+  {
+    id: 'user-packing-001',
+    phoneNumber: '+15551234570',
+    name: 'Sarah Johnson',
+    role: 'packing_staff',
+    email: 'sarah@farmexample.com',
+    createdAt: new Date('2024-02-15'),
+    updatedAt: new Date('2024-03-10'),
+  },
+]
+
+// Mock Zones
+export const mockZones: Zone[] = [
+  {
+    id: 'zone-001',
+    name: 'Seed Storage A',
+    type: 'seed_storage',
+    description: 'Climate-controlled seed storage facility',
+    capacity: 1000,
+    currentOccupancy: 450,
+    createdAt: new Date('2024-01-10'),
+    updatedAt: new Date('2024-03-20'),
+  },
+  {
+    id: 'zone-002',
+    name: 'Main Nursery',
+    type: 'nursery',
+    description: 'Primary nursery area for seedling germination',
+    capacity: 500,
+    currentOccupancy: 320,
+    createdAt: new Date('2024-01-10'),
+    updatedAt: new Date('2024-03-22'),
+  },
+  {
+    id: 'zone-003',
+    name: 'Growth Beds - Section 1',
+    type: 'growth_beds',
+    description: 'Outdoor growth beds for mature plants',
+    capacity: 800,
+    currentOccupancy: 650,
+    createdAt: new Date('2024-01-10'),
+    updatedAt: new Date('2024-03-21'),
+  },
+  {
+    id: 'zone-004',
+    name: 'Equipment Storage',
+    type: 'equipment_storage',
+    description: 'Main storage for farm equipment and tools',
+    capacity: 200,
+    currentOccupancy: 85,
+    createdAt: new Date('2024-01-10'),
+    updatedAt: new Date('2024-03-15'),
+  },
+  {
+    id: 'zone-005',
+    name: 'Packing Area',
+    type: 'packing_area',
+    description: 'Central packing and shipping area',
+    capacity: 300,
+    currentOccupancy: 120,
+    createdAt: new Date('2024-01-10'),
+    updatedAt: new Date('2024-03-23'),
+  },
+]
+
+// Mock Inventory Items
+export const mockInventory: InventoryItem[] = [
+  {
+    id: 'inv-001',
+    name: 'Tomato Seeds - Cherry Red',
+    category: 'seeds',
+    description: 'Heirloom cherry tomato seeds, high yield variety',
+    zoneId: 'zone-001',
+    quantity: 250,
+    currentStage: 'storage',
+    qrCode: 'QR-INV-001',
+    maintenanceGuide: 'Store in cool, dry place. Viability: 3-5 years',
+    botanicalDescription: 'Solanum lycopersicum var. cerasiforme',
+    careInstructions: 'Plant in well-drained soil, full sun exposure',
+    idealConditions: 'Temperature: 70-85°F, pH: 6.0-6.8',
+    growthTime: '60-80 days from transplant',
+    historicalNotes: ['Excellent germination rate in 2024 spring batch', 'Disease resistant variety'],
+    createdAt: new Date('2024-02-01'),
+    updatedAt: new Date('2024-03-20'),
+    createdBy: 'user-manager-001',
+    images: [],
+  },
+  {
+    id: 'inv-002',
+    name: 'Basil Seedlings - Sweet Genovese',
+    category: 'plants',
+    description: 'Sweet basil seedlings, 4-6 weeks old',
+    zoneId: 'zone-002',
+    quantity: 180,
+    currentStage: 'growth_period',
+    qrCode: 'QR-INV-002',
+    botanicalDescription: 'Ocimum basilicum',
+    careInstructions: 'Water regularly, pinch flowering tops to encourage bushiness',
+    idealConditions: 'Temperature: 65-85°F, indirect sunlight initially',
+    growthTime: '30-45 days to harvest',
+    historicalNotes: ['Started from seed 6 weeks ago', 'Transplanted to individual pots'],
+    createdAt: new Date('2024-02-15'),
+    updatedAt: new Date('2024-03-22'),
+    createdBy: 'user-worker-001',
+    images: [],
+  },
+  {
+    id: 'inv-003',
+    name: 'Lemon Tree - Meyer',
+    category: 'trees',
+    description: 'Meyer lemon tree, 2-year-old grafted',
+    zoneId: 'zone-003',
+    quantity: 15,
+    currentStage: 'mature',
+    qrCode: 'QR-INV-003',
+    botanicalDescription: 'Citrus × meyeri',
+    careInstructions: 'Water deeply but infrequently, fertilize monthly during growing season',
+    idealConditions: 'Full sun, well-drained soil, protect from frost',
+    growthTime: 'Fruit bearing: 2-3 years',
+    historicalNotes: [
+      'Grafted on dwarf rootstock',
+      'First fruiting expected this season',
+      'Pruned in January',
+    ],
+    createdAt: new Date('2023-03-10'),
+    updatedAt: new Date('2024-03-18'),
+    createdBy: 'user-manager-001',
+    images: [],
+  },
+  {
+    id: 'inv-004',
+    name: 'Lettuce Mix - Spring Greens',
+    category: 'plants',
+    description: 'Mixed lettuce varieties ready for sale',
+    zoneId: 'zone-005',
+    quantity: 95,
+    currentStage: 'ready_for_sale',
+    qrCode: 'QR-INV-004',
+    botanicalDescription: 'Lactuca sativa (mixed varieties)',
+    careInstructions: 'Keep soil moist, harvest outer leaves first',
+    idealConditions: 'Cool weather crop, 60-70°F optimal',
+    growthTime: '45-55 days from seed',
+    historicalNotes: ['Ready for immediate sale', 'Premium quality batch', 'Organic certified'],
+    createdAt: new Date('2024-01-20'),
+    updatedAt: new Date('2024-03-23'),
+    createdBy: 'user-worker-001',
+    images: [],
+  },
+  {
+    id: 'inv-005',
+    name: 'Garden Hose - 50ft',
+    category: 'equipment',
+    description: 'Heavy-duty garden hose with spray nozzle',
+    zoneId: 'zone-004',
+    quantity: 8,
+    currentStage: 'storage',
+    qrCode: 'QR-INV-005',
+    maintenanceGuide: 'Drain after use, store coiled, check for leaks monthly',
+    historicalNotes: ['Purchased Q1 2024', 'Good condition'],
+    createdAt: new Date('2024-01-05'),
+    updatedAt: new Date('2024-03-15'),
+    createdBy: 'user-manager-001',
+    images: [],
+  },
+  {
+    id: 'inv-006',
+    name: 'Strawberry Plants - Everbearing',
+    category: 'plants',
+    description: 'Everbearing strawberry plants in 4" pots',
+    zoneId: 'zone-003',
+    quantity: 120,
+    currentStage: 'mature',
+    qrCode: 'QR-INV-006',
+    botanicalDescription: 'Fragaria × ananassa',
+    careInstructions: 'Full sun, consistent moisture, remove runners for larger fruit',
+    idealConditions: 'Temperature: 60-80°F, slightly acidic soil',
+    growthTime: 'Fruit production: 4-6 weeks after planting',
+    historicalNotes: ['Producing fruit continuously', 'High customer demand'],
+    createdAt: new Date('2023-10-15'),
+    updatedAt: new Date('2024-03-21'),
+    createdBy: 'user-worker-001',
+    images: [],
+  },
+]
+
+// Mock Customers
+export const mockCustomers: Customer[] = [
+  {
+    id: 'cust-001',
+    name: 'Green Valley Restaurant',
+    type: 'wholesale',
+    phoneNumber: '+15559876543',
+    email: 'orders@greenvalley.com',
+    companyName: 'Green Valley Restaurant Group',
+    approved: true,
+    createdAt: new Date('2024-01-20'),
+  },
+  {
+    id: 'cust-002',
+    name: 'Alice Williams',
+    type: 'retail',
+    phoneNumber: '+15559876544',
+    email: 'alice.w@email.com',
+    approved: true,
+    createdAt: new Date('2024-03-10'),
+  },
+  {
+    id: 'cust-003',
+    name: 'Organic Market Co-op',
+    type: 'wholesale',
+    phoneNumber: '+15559876545',
+    email: 'purchasing@organicmarket.com',
+    companyName: 'Organic Market Co-op',
+    approved: true,
+    createdAt: new Date('2024-02-05'),
+  },
+]
+
+// Mock Orders
+export const mockOrders: Order[] = [
+  {
+    id: 'order-001',
+    customerId: 'cust-001',
+    customerName: 'Green Valley Restaurant',
+    customerPhone: '+15559876543',
+    customerEmail: 'orders@greenvalley.com',
+    items: [
+      {
+        itemId: 'inv-004',
+        itemName: 'Lettuce Mix - Spring Greens',
+        quantity: 30,
+        pricePerUnit: 3.5,
+        totalPrice: 105,
+      },
+      {
+        itemId: 'inv-002',
+        itemName: 'Basil Seedlings - Sweet Genovese',
+        quantity: 20,
+        pricePerUnit: 2.75,
+        totalPrice: 55,
+      },
+    ],
+    totalAmount: 160,
+    status: 'pending',
+    fulfillmentType: 'delivery',
+    deliveryAddress: '123 Restaurant Row, Cityville, ST 12345',
+    notes: 'Please deliver before 10 AM',
+    createdAt: new Date('2024-03-22'),
+    updatedAt: new Date('2024-03-22'),
+  },
+  {
+    id: 'order-002',
+    customerId: 'cust-002',
+    customerName: 'Alice Williams',
+    customerPhone: '+15559876544',
+    customerEmail: 'alice.w@email.com',
+    items: [
+      {
+        itemId: 'inv-003',
+        itemName: 'Lemon Tree - Meyer',
+        quantity: 1,
+        pricePerUnit: 45,
+        totalPrice: 45,
+      },
+      {
+        itemId: 'inv-006',
+        itemName: 'Strawberry Plants - Everbearing',
+        quantity: 6,
+        pricePerUnit: 8,
+        totalPrice: 48,
+      },
+    ],
+    totalAmount: 93,
+    status: 'ready',
+    fulfillmentType: 'pickup',
+    pickupDate: new Date('2024-03-25'),
+    createdAt: new Date('2024-03-20'),
+    updatedAt: new Date('2024-03-23'),
+  },
+  {
+    id: 'order-003',
+    customerId: 'cust-003',
+    customerName: 'Organic Market Co-op',
+    customerPhone: '+15559876545',
+    customerEmail: 'purchasing@organicmarket.com',
+    items: [
+      {
+        itemId: 'inv-004',
+        itemName: 'Lettuce Mix - Spring Greens',
+        quantity: 50,
+        pricePerUnit: 3.25,
+        totalPrice: 162.5,
+      },
+    ],
+    totalAmount: 162.5,
+    status: 'completed',
+    fulfillmentType: 'pickup',
+    pickupDate: new Date('2024-03-21'),
+    createdAt: new Date('2024-03-18'),
+    updatedAt: new Date('2024-03-21'),
+  },
+]
+
+// Mock Activities
+export const mockActivities: ActivityLog[] = [
+  {
+    id: 'act-001',
+    userId: 'user-worker-001',
+    userName: 'Maria Garcia',
+    type: 'item_created',
+    description: 'Created new inventory item: Basil Seedlings - Sweet Genovese',
+    entityType: 'inventory',
+    entityId: 'inv-002',
+    timestamp: new Date('2024-02-15T09:30:00'),
+  },
+  {
+    id: 'act-002',
+    userId: 'user-manager-001',
+    userName: 'David Chen',
+    type: 'item_updated',
+    description: 'Updated quantity for Lettuce Mix - Spring Greens (95 units)',
+    entityType: 'inventory',
+    entityId: 'inv-004',
+    timestamp: new Date('2024-03-23T14:20:00'),
+  },
+  {
+    id: 'act-003',
+    userId: 'user-admin-001',
+    userName: 'John Smith',
+    type: 'zone_created',
+    description: 'Created new zone: Packing Area',
+    entityType: 'zone',
+    entityId: 'zone-005',
+    timestamp: new Date('2024-01-10T11:00:00'),
+  },
+  {
+    id: 'act-004',
+    userId: 'user-packing-001',
+    userName: 'Sarah Johnson',
+    type: 'order_fulfilled',
+    description: 'Fulfilled order for Organic Market Co-op',
+    entityType: 'order',
+    entityId: 'order-003',
+    timestamp: new Date('2024-03-21T16:45:00'),
+  },
+  {
+    id: 'act-005',
+    userId: 'user-worker-001',
+    userName: 'Maria Garcia',
+    type: 'stage_transitioned',
+    description: 'Moved Strawberry Plants to mature stage',
+    entityType: 'inventory',
+    entityId: 'inv-006',
+    timestamp: new Date('2024-03-21T10:15:00'),
+  },
+]
+
+// Mock Notifications
+export const mockNotifications: Notification[] = [
+  {
+    id: 'notif-001',
+    userId: 'user-admin-001',
+    type: 'new_order',
+    title: 'New Order Received',
+    message: 'Green Valley Restaurant placed a new order for $160.00',
+    read: false,
+    actionUrl: '/orders/order-001',
+    createdAt: new Date('2024-03-22T13:30:00'),
+  },
+  {
+    id: 'notif-002',
+    userId: 'user-manager-001',
+    type: 'low_inventory',
+    title: 'Low Inventory Alert',
+    message: 'Lettuce Mix - Spring Greens is running low (95 units remaining)',
+    read: false,
+    actionUrl: '/inventory/inv-004',
+    createdAt: new Date('2024-03-23T09:00:00'),
+  },
+  {
+    id: 'notif-003',
+    userId: 'user-packing-001',
+    type: 'item_ready_for_pickup',
+    title: 'Order Ready for Pickup',
+    message: 'Order for Alice Williams is ready for pickup tomorrow',
+    read: true,
+    actionUrl: '/orders/order-002',
+    createdAt: new Date('2024-03-23T15:30:00'),
+  },
+]
+
+// Mock Stage Transitions
+export const mockStageTransitions: StageTransition[] = [
+  {
+    id: 'trans-001',
+    itemId: 'inv-002',
+    fromStage: 'watering',
+    toStage: 'growth_period',
+    completedBy: 'user-worker-001',
+    completedAt: new Date('2024-03-01T10:00:00'),
+    notes: 'Seedlings showing strong growth',
+    duration: 14,
+  },
+  {
+    id: 'trans-002',
+    itemId: 'inv-004',
+    fromStage: 'mature',
+    toStage: 'ready_for_sale',
+    completedBy: 'user-manager-001',
+    completedAt: new Date('2024-03-20T14:30:00'),
+    notes: 'Quality checked and approved for sale',
+    duration: 7,
+  },
+  {
+    id: 'trans-003',
+    itemId: 'inv-006',
+    fromStage: 'growth_period',
+    toStage: 'mature',
+    completedBy: 'user-worker-001',
+    completedAt: new Date('2024-03-21T10:15:00'),
+    notes: 'Plants are producing fruit',
+    duration: 21,
+  },
+]
+
+// Mock data store (acts like an in-memory database)
+export const mockDatabase = {
+  users: new Map(mockUsers.map((u) => [u.id, u])),
+  inventory: new Map(mockInventory.map((i) => [i.id, i])),
+  zones: new Map(mockZones.map((z) => [z.id, z])),
+  orders: new Map(mockOrders.map((o) => [o.id, o])),
+  customers: new Map(mockCustomers.map((c) => [c.id, c])),
+  activities: new Map(mockActivities.map((a) => [a.id, a])),
+  notifications: new Map(mockNotifications.map((n) => [n.id, n])),
+  stageTransitions: new Map(mockStageTransitions.map((t) => [t.id, t])),
+}
+
+// Helper to reset mock data
+export const resetMockData = () => {
+  mockDatabase.users = new Map(mockUsers.map((u) => [u.id, u]))
+  mockDatabase.inventory = new Map(mockInventory.map((i) => [i.id, i]))
+  mockDatabase.zones = new Map(mockZones.map((z) => [z.id, z]))
+  mockDatabase.orders = new Map(mockOrders.map((o) => [o.id, o]))
+  mockDatabase.customers = new Map(mockCustomers.map((c) => [c.id, c]))
+  mockDatabase.activities = new Map(mockActivities.map((a) => [a.id, a]))
+  mockDatabase.notifications = new Map(mockNotifications.map((n) => [n.id, n]))
+  mockDatabase.stageTransitions = new Map(mockStageTransitions.map((t) => [t.id, t]))
+}

@@ -1,66 +1,211 @@
+import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/contexts/AuthContext'
+import { firestoreHelpers, COLLECTIONS } from '@/lib/dataProvider'
+import type { InventoryItem, Order } from '@/types'
 
 export const DashboardPage = () => {
   const { user } = useAuth()
+  const [inventory, setInventory] = useState<InventoryItem[]>([])
+  const [orders, setOrders] = useState<Order[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [inventoryData, ordersData] = await Promise.all([
+          firestoreHelpers.getCollection<InventoryItem>(COLLECTIONS.INVENTORY),
+          firestoreHelpers.getCollection<Order>(COLLECTIONS.ORDERS),
+        ])
+        setInventory(inventoryData)
+        setOrders(ordersData)
+      } catch (error) {
+        console.error('Failed to load dashboard data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadData()
+  }, [])
+
+  const stats = {
+    totalInventory: inventory.length,
+    activeGrowth: inventory.filter((item) => item.currentStage === 'growth_period').length,
+    readyForSale: inventory.filter((item) => item.currentStage === 'ready_for_sale').length,
+    pendingOrders: orders.filter((order) => order.status === 'pending').length,
+  }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">Welcome back, {user?.name || 'User'}!</p>
+    <div className="space-y-8">
+      {/* Welcome Header */}
+      <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl p-8 text-white shadow-xl">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">
+              Welcome back, {user?.name?.split(' ')[0] || 'User'}!
+            </h1>
+            <p className="text-green-100 text-lg">
+              Here's what's happening with the farm today
+            </p>
+          </div>
+          <div className="hidden md:block">
+            <div className="text-6xl">🌱</div>
+          </div>
+        </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+      {/* Stats Grid */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow bg-gradient-to-br from-white to-green-50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Inventory</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Total Inventory
+            </CardTitle>
+            <div className="text-2xl">📦</div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground">items in stock</p>
+            <div className="text-3xl font-bold text-green-700">
+              {loading ? '...' : stats.totalInventory}
+            </div>
+            <p className="text-xs text-gray-500 mt-1">items in stock</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow bg-gradient-to-br from-white to-emerald-50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Growth Cycles</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Active Growth
+            </CardTitle>
+            <div className="text-2xl">🌿</div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground">items in production</p>
+            <div className="text-3xl font-bold text-emerald-700">
+              {loading ? '...' : stats.activeGrowth}
+            </div>
+            <p className="text-xs text-gray-500 mt-1">items growing</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow bg-gradient-to-br from-white to-green-50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Ready for Sale</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Ready for Sale
+            </CardTitle>
+            <div className="text-2xl">✅</div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground">items available</p>
+            <div className="text-3xl font-bold text-green-700">
+              {loading ? '...' : stats.readyForSale}
+            </div>
+            <p className="text-xs text-gray-500 mt-1">items available</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow bg-gradient-to-br from-white to-emerald-50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Orders</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Pending Orders
+            </CardTitle>
+            <div className="text-2xl">🛒</div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground">orders to fulfill</p>
+            <div className="text-3xl font-bold text-emerald-700">
+              {loading ? '...' : stats.pendingOrders}
+            </div>
+            <p className="text-xs text-gray-500 mt-1">orders to fulfill</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">No recent activity to display.</p>
-        </CardContent>
-      </Card>
+      {/* Quick Overview */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card className="border-0 shadow-lg bg-white">
+          <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-green-50/30 pb-4">
+            <CardTitle className="text-gray-900 font-semibold">
+              Inventory Overview
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6">
+            {loading ? (
+              <p className="text-sm text-gray-500">Loading...</p>
+            ) : inventory.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-sm text-gray-500">No inventory items yet.</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {inventory.slice(0, 5).map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-green-200 hover:bg-green-50/50 transition-all"
+                  >
+                    <div className="flex-1">
+                      <p className="font-medium text-sm text-gray-900">{item.name}</p>
+                      <p className="text-xs text-gray-500 capitalize mt-0.5">
+                        {item.currentStage.replace(/_/g, ' ')}
+                      </p>
+                    </div>
+                    <div className="text-right ml-4">
+                      <p className="font-bold text-base text-green-700">
+                        {item.quantity}
+                      </p>
+                      <p className="text-xs text-gray-500">in stock</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-lg bg-white">
+          <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-green-50/30 pb-4">
+            <CardTitle className="text-gray-900 font-semibold">
+              Recent Orders
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6">
+            {loading ? (
+              <p className="text-sm text-gray-500">Loading...</p>
+            ) : orders.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-sm text-gray-500">No orders yet.</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {orders.slice(0, 5).map((order) => (
+                  <div
+                    key={order.id}
+                    className="flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-green-200 hover:bg-green-50/50 transition-all"
+                  >
+                    <div className="flex-1">
+                      <p className="font-medium text-sm text-gray-900">
+                        Order #{order.id.slice(-6)}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5">{order.customerName}</p>
+                    </div>
+                    <div className="ml-4">
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium capitalize ${
+                          order.status === 'pending'
+                            ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+                            : order.status === 'ready'
+                            ? 'bg-green-100 text-green-800 border border-green-200'
+                            : order.status === 'completed'
+                            ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                            : 'bg-gray-100 text-gray-800 border border-gray-200'
+                        }`}
+                      >
+                        {order.status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

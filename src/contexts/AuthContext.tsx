@@ -1,10 +1,9 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import type { User as FirebaseUser } from 'firebase/auth'
 import type { User } from '@/types'
-import { observeAuthState, getUserProfile } from '@/lib/auth'
+import { observeAuthState, getUserProfile, signOut } from '@/lib/dataProvider'
 
 interface AuthContextType {
-  firebaseUser: FirebaseUser | null
+  firebaseUser: any | null // Can be Firebase user or mock user
   user: User | null
   loading: boolean
   signOut: () => Promise<void>
@@ -25,38 +24,54 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null)
+  console.log('🏗️ AuthProvider: Component rendering')
+
+  const [firebaseUser, setFirebaseUser] = useState<any | null>(null)
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
+  console.log('🏗️ AuthProvider: Current state - user:', user, 'loading:', loading)
+
   useEffect(() => {
-    const unsubscribe = observeAuthState(async (firebaseUser) => {
-      setFirebaseUser(firebaseUser)
+    console.log('🔐 AuthContext: useEffect running - Setting up auth state observer')
 
-      if (firebaseUser) {
-        // Fetch user profile from Firestore
-        const userProfile = await getUserProfile(firebaseUser.uid)
-        setUser(userProfile)
-      } else {
+    const unsubscribe = observeAuthState(async (authUser) => {
+      try {
+        console.log('🔐 AuthContext: ⚡ Auth state callback triggered:', authUser)
+        setFirebaseUser(authUser)
+
+        if (authUser) {
+          // Fetch user profile from Firestore or mock database
+          console.log('🔐 AuthContext: Fetching user profile for', authUser.uid)
+          const userProfile = await getUserProfile(authUser.uid)
+          console.log('🔐 AuthContext: User profile loaded:', userProfile)
+          setUser(userProfile)
+        } else {
+          console.log('🔐 AuthContext: No user, clearing state')
+          setUser(null)
+        }
+
+        setLoading(false)
+      } catch (error) {
+        console.error('🔐 AuthContext: Error in auth state callback:', error)
         setUser(null)
+        setLoading(false)
       }
-
-      setLoading(false)
     })
 
-    return unsubscribe
-  }, [])
+    console.log('🔐 AuthContext: Observer registered, unsubscribe function:', typeof unsubscribe)
 
-  const handleSignOut = async () => {
-    const { signOut: firebaseSignOut } = await import('@/lib/auth')
-    await firebaseSignOut()
-  }
+    return () => {
+      console.log('🔐 AuthContext: Cleaning up observer')
+      unsubscribe()
+    }
+  }, [])
 
   const value = {
     firebaseUser,
     user,
     loading,
-    signOut: handleSignOut,
+    signOut,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

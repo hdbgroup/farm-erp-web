@@ -1,0 +1,143 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ============================================
+    // Helper Functions
+    // ============================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return request.auth != null &&
+             firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function hasAnyRole(roles) {
+      return request.auth != null &&
+             firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role in roles;
+    }
+
+    // File size limit (10MB)
+    function isValidSize() {
+      return request.resource.size < 10 * 1024 * 1024;
+    }
+
+    // Valid image types
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+
+    // Valid document types
+    function isDocument() {
+      return request.resource.contentType.matches('application/pdf') ||
+             request.resource.contentType.matches('application/msword') ||
+             request.resource.contentType.matches('application/vnd.openxmlformats-officedocument.*');
+    }
+
+    // ============================================
+    // Inventory Images
+    // ============================================
+
+    match /inventory/{itemId}/{fileName} {
+      // Anyone authenticated can read inventory images
+      allow read: if isAuthenticated();
+
+      // Farm workers, inventory managers, and admins can upload images
+      allow create, update: if hasAnyRole(['admin', 'farm_worker', 'inventory_manager']) &&
+                               isImage() &&
+                               isValidSize();
+
+      // Only admins can delete images
+      allow delete: if isAdmin();
+    }
+
+    // ============================================
+    // Product Images (for marketplace)
+    // ============================================
+
+    match /products/{productId}/{fileName} {
+      // Anyone can read product images (public)
+      allow read: if true;
+
+      // Inventory managers and admins can upload product images
+      allow create, update: if hasAnyRole(['admin', 'inventory_manager']) &&
+                               isImage() &&
+                               isValidSize();
+
+      // Only admins can delete product images
+      allow delete: if isAdmin();
+    }
+
+    // ============================================
+    // User Profile Pictures
+    // ============================================
+
+    match /users/{userId}/profile/{fileName} {
+      // Anyone authenticated can read profile pictures
+      allow read: if isAuthenticated();
+
+      // Users can upload their own profile picture, or admins can upload any
+      allow create, update: if (isAuthenticated() && request.auth.uid == userId && isImage() && isValidSize()) ||
+                               isAdmin();
+
+      // Users can delete their own profile picture, or admins can delete any
+      allow delete: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
+    }
+
+    // ============================================
+    // Documents (receipts, invoices, etc.)
+    // ============================================
+
+    match /documents/{category}/{documentId} {
+      // All authenticated users can read documents
+      allow read: if isAuthenticated();
+
+      // Inventory managers, packing staff, and admins can upload documents
+      allow create, update: if hasAnyRole(['admin', 'inventory_manager', 'packing_staff']) &&
+                               (isImage() || isDocument()) &&
+                               isValidSize();
+
+      // Only admins can delete documents
+      allow delete: if isAdmin();
+    }
+
+    // ============================================
+    // QR Code Labels
+    // ============================================
+
+    match /qr-codes/{itemId}/{fileName} {
+      // Anyone authenticated can read QR codes
+      allow read: if isAuthenticated();
+
+      // Farm workers, inventory managers, and admins can generate QR codes
+      allow create, update: if hasAnyRole(['admin', 'farm_worker', 'inventory_manager']) &&
+                               isImage() &&
+                               isValidSize();
+
+      // Only admins can delete QR codes
+      allow delete: if isAdmin();
+    }
+
+    // ============================================
+    // Temporary Uploads
+    // ============================================
+
+    match /temp/{userId}/{fileName} {
+      // Users can only access their own temp files
+      allow read, write: if isAuthenticated() && request.auth.uid == userId && isValidSize();
+    }
+
+    // ============================================
+    // Default Deny All
+    // ============================================
+
+    // Deny access to any other paths not explicitly defined
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

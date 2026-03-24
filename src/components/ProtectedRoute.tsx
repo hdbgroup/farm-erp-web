@@ -14,19 +14,29 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 }) => {
   const { user, loading } = useAuth()
 
+  console.log('🛡️ ProtectedRoute: loading=', loading, 'user=', user)
+
   if (loading) {
+    console.log('🛡️ ProtectedRoute: Still loading...')
     return (
       <div className="flex h-screen items-center justify-center">
-        <Spinner size="lg" />
+        <div className="text-center">
+          <Spinner size="lg" />
+          <p className="mt-4 text-muted-foreground">Loading...</p>
+        </div>
       </div>
     )
   }
 
   if (!user) {
+    console.log('🛡️ ProtectedRoute: No user, redirecting to login')
     return <Navigate to="/login" replace />
   }
 
+  console.log('🛡️ ProtectedRoute: User authenticated:', user.name)
+
   if (requiredRoles && !requiredRoles.includes(user.role)) {
+    console.log('🛡️ ProtectedRoute: Access denied for role:', user.role)
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
@@ -39,5 +49,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     )
   }
 
+  console.log('🛡️ ProtectedRoute: Access granted')
   return <>{children}</>
 }
