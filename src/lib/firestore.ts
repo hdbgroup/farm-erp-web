@@ -21,6 +21,7 @@ import type {
   CollectionReference,
 } from 'firebase/firestore'
 import { db } from './firebase'
+import { toDate as convertToDate } from './dateHelpers'
 
 // Collection names
 export const COLLECTIONS = {
@@ -35,12 +36,8 @@ export const COLLECTIONS = {
   PRODUCT_INFO: 'product_info',
 } as const
 
-// Helper to convert Firestore timestamp to Date
-export const toDate = (timestamp: Timestamp | Date | undefined): Date | undefined => {
-  if (!timestamp) return undefined
-  if (timestamp instanceof Date) return timestamp
-  return timestamp.toDate()
-}
+// Helper to convert Firestore timestamp to Date (re-exported from dateHelpers)
+export const toDate = convertToDate
 
 // Helper to convert Date to Firestore timestamp
 export const toTimestamp = (date: Date | undefined): Timestamp | undefined => {

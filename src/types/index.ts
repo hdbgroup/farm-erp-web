@@ -1,5 +1,21 @@
 // User and Authentication Types
-export type UserRole = 'admin' | 'farm_worker' | 'inventory_manager' | 'packing_staff'
+export type UserRole = 'admin' | 'manager' | 'farm_worker' | 'logistics' | 'accounts'
+
+export type UserStatus = 'active' | 'inactive' | 'on_leave' | 'terminated'
+
+export interface License {
+  type: string
+  number: string
+  expiry: Date
+}
+
+export interface UserProfile {
+  address?: string
+  dob?: Date
+  emergencyContactName?: string
+  emergencyContactPhone?: string
+  licenses?: License[]
+}
 
 export interface User {
   id: string
@@ -7,8 +23,13 @@ export interface User {
   name: string
   role: UserRole
   email?: string
+  status?: UserStatus
+  hireDate?: Date
+  profile?: UserProfile
+  assignedTasks?: string[]
   createdAt: Date
   updatedAt: Date
+  createdBy?: string
 }
 
 // Inventory Types
@@ -100,42 +121,8 @@ export interface ItemProcessingRecord {
 }
 
 // Team/Activity Types
-export type EmployeeStatus = 'active' | 'inactive' | 'on_leave' | 'terminated'
-
-export interface License {
-  type: string
-  number: string
-  expiry: Date
-}
-
-export interface EmployeeProfile {
-  address?: string
-  dob?: Date
-  emergencyContactName?: string
-  emergencyContactPhone?: string
-  licenses?: License[]
-}
-
-export interface Employee {
-  id: string
-  fullName: string
-  email: string
-  phone: string
-  role: UserRole
-  status: EmployeeStatus
-  hireDate: Date
-  profile?: EmployeeProfile
-  assignedTasks?: string[]
-  createdAt: Date
-  updatedAt: Date
-  createdBy: string
-}
-
-// Legacy - keeping for backwards compatibility
-export interface TeamMember extends User {
-  assignedTasks: string[]
-  activityLog: ActivityLog[]
-}
+// Note: Employee/TeamMember is now just User with additional fields
+// Use User type instead of separate Employee type
 
 export type ActivityType =
   | 'item_created'

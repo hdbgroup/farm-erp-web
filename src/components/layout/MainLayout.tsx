@@ -136,11 +136,6 @@ export const MainLayout = () => {
             </button>
 
             <Breadcrumbs />
-
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="hidden sm:inline text-sm text-gray-600">System Online</span>
-            </div>
           </div>
         </header>
 

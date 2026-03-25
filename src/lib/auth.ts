@@ -6,9 +6,23 @@ import {
 } from 'firebase/auth'
 import type { ConfirmationResult, User as FirebaseUser } from 'firebase/auth'
 import { auth, db } from './firebase'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc, serverTimestamp, query, collection, where, getDocs } from 'firebase/firestore'
 import type { User, UserRole } from '@/types'
 import { COLLECTIONS } from './firestore'
+import { toDate } from './dateHelpers'
+
+// Check if phone number is registered in Firestore
+export const isPhoneNumberRegistered = async (phoneNumber: string): Promise<boolean> => {
+  try {
+    const usersRef = collection(db, COLLECTIONS.USERS)
+    const q = query(usersRef, where('phoneNumber', '==', phoneNumber))
+    const querySnapshot = await getDocs(q)
+    return !querySnapshot.empty
+  } catch (error) {
+    console.error('Error checking phone number:', error)
+    return false
+  }
+}
 
 // Initialize RecaptchaVerifier (call this once when the component mounts)
 export const initRecaptchaVerifier = (elementId: string): RecaptchaVerifier => {
@@ -57,7 +71,18 @@ export const getUserProfile = async (userId: string): Promise<User | null> => {
   try {
     const userDoc = await getDoc(doc(db, COLLECTIONS.USERS, userId))
     if (userDoc.exists()) {
-      return userDoc.data() as User
+      const data = userDoc.data()
+      // Convert Firestore Timestamps to Dates
+      return {
+        ...data,
+        createdAt: toDate(data.createdAt) || new Date(),
+        updatedAt: toDate(data.updatedAt) || new Date(),
+        hireDate: toDate(data.hireDate),
+        profile: data.profile ? {
+          ...data.profile,
+          dob: toDate(data.profile.dob),
+        } : undefined,
+      } as User
     }
     return null
   } catch (error) {
@@ -76,8 +101,8 @@ export const createUserProfile = async (
     await setDoc(userRef, {
       id: userId,
       ...data,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
     })
   } catch (error) {
     console.error('Error creating user profile:', error)
@@ -96,7 +121,7 @@ export const updateUserProfile = async (
       userRef,
       {
         ...data,
-        updatedAt: new Date(),
+        updatedAt: serverTimestamp(),
       },
       { merge: true }
     )

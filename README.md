@@ -268,9 +268,10 @@ The app uses Firebase Phone Authentication with OTP (One-Time Password).
 
 **Roles:**
 - `admin` - Full access to all features
+- `manager` - Manage inventory, zones, and team
 - `farm_worker` - Access to inventory and zones
-- `inventory_manager` - Manage inventory and orders
-- `packing_staff` - View orders and fulfill them
+- `logistics` - Manage orders and fulfillment
+- `accounts` - Financial and accounting operations
 
 ## Features Status
 

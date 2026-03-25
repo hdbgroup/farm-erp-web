@@ -11,6 +11,16 @@ import { mockDatabase } from './data'
 let currentUser: { uid: string; phoneNumber: string } | null = null
 const authStateListeners: Array<(user: any) => void> = []
 
+// Check if phone number is registered
+export const isPhoneNumberRegistered = async (phoneNumber: string): Promise<boolean> => {
+  await new Promise((resolve) => setTimeout(resolve, 100)) // Simulate network delay
+  const exists = Array.from(mockDatabase.users.values()).some(
+    (u) => u.phoneNumber === phoneNumber
+  )
+  console.log(`🔐 Mock: Phone ${phoneNumber} registered:`, exists)
+  return exists
+}
+
 // Mock RecaptchaVerifier
 export class MockRecaptchaVerifier {
   elementId: string

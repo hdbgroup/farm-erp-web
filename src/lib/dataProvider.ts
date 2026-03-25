@@ -26,6 +26,7 @@ export const storage = USE_MOCK_DATA ? mockStorage : null
 
 // Export auth functions
 export const {
+  isPhoneNumberRegistered,
   initRecaptchaVerifier,
   sendOTP,
   verifyOTP,

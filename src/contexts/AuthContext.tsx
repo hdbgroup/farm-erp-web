@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import type { User } from '@/types'
-import { observeAuthState, getUserProfile, signOut } from '@/lib/dataProvider'
+import { observeAuthState, getUserProfile, createUserProfile, signOut } from '@/lib/dataProvider'
+import { toTimestamp } from '@/lib/dateHelpers'
 
 interface AuthContextType {
   firebaseUser: any | null // Can be Firebase user or mock user
@@ -44,6 +45,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           // Fetch user profile from Firestore or mock database
           console.log('🔐 AuthContext: Fetching user profile for', authUser.uid)
           const userProfile = await getUserProfile(authUser.uid)
+
+          // If no profile exists, user is not authorized - sign them out
+          if (!userProfile) {
+            console.log('🔐 AuthContext: ❌ No user profile found, user not authorized')
+            await signOut()
+            setUser(null)
+            setLoading(false)
+            return
+          }
+
           console.log('🔐 AuthContext: User profile loaded:', userProfile)
           setUser(userProfile)
         } else {

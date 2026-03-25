@@ -31,7 +31,7 @@ service cloud.firestore {
     }
 
     // ============================================
-    // Users Collection
+    // Users Collection (also serves as team members/employees)
     // ============================================
 
     match /users/{userId} {
@@ -39,10 +39,11 @@ service cloud.firestore {
       allow read: if isAuthenticated();
 
       // Users can create their own profile on first login
-      allow create: if isAuthenticated() && isOwner(userId);
+      // Admins and managers can create other user profiles
+      allow create: if isAuthenticated() && (isOwner(userId) || hasAnyRole(['admin', 'manager']));
 
-      // Users can update their own profile, or admins can update any profile
-      allow update: if isAdmin() || isOwner(userId);
+      // Users can update their own profile, admins/managers can update any profile
+      allow update: if isAdmin() || hasAnyRole(['admin', 'manager']) || isOwner(userId);
 
       // Only admins can delete users
       allow delete: if isAdmin();
@@ -56,8 +57,8 @@ service cloud.firestore {
       // All authenticated users can read inventory
       allow read: if isAuthenticated();
 
-      // Farm workers, inventory managers, and admins can create/update inventory
-      allow create, update: if hasAnyRole(['admin', 'farm_worker', 'inventory_manager']);
+      // Farm workers, managers, and admins can create/update inventory
+      allow create, update: if hasAnyRole(['admin', 'manager', 'farm_worker']);
 
       // Only admins can delete inventory items
       allow delete: if isAdmin();
@@ -71,8 +72,8 @@ service cloud.firestore {
       // All authenticated users can read zones
       allow read: if isAuthenticated();
 
-      // Farm workers, inventory managers, and admins can manage zones
-      allow create, update: if hasAnyRole(['admin', 'farm_worker', 'inventory_manager']);
+      // Farm workers, managers, and admins can manage zones
+      allow create, update: if hasAnyRole(['admin', 'manager', 'farm_worker']);
 
       // Only admins can delete zones
       allow delete: if isAdmin();
@@ -89,8 +90,8 @@ service cloud.firestore {
       // Anyone authenticated can create orders (for walk-in customers)
       allow create: if isAuthenticated();
 
-      // Inventory managers, packing staff, and admins can update orders
-      allow update: if hasAnyRole(['admin', 'inventory_manager', 'packing_staff']);
+      // Managers, logistics, and admins can update orders
+      allow update: if hasAnyRole(['admin', 'manager', 'logistics']);
 
       // Only admins can delete orders
       allow delete: if isAdmin();
@@ -107,8 +108,8 @@ service cloud.firestore {
       // Anyone can create a customer record
       allow create: if isAuthenticated();
 
-      // Inventory managers and admins can update customers
-      allow update: if hasAnyRole(['admin', 'inventory_manager']);
+      // Managers, logistics, and admins can update customers
+      allow update: if hasAnyRole(['admin', 'manager', 'logistics']);
 
       // Only admins can delete customers
       allow delete: if isAdmin();
@@ -155,8 +156,8 @@ service cloud.firestore {
       // All authenticated users can read stage transitions
       allow read: if isAuthenticated();
 
-      // Farm workers, inventory managers, and admins can create transitions
-      allow create: if hasAnyRole(['admin', 'farm_worker', 'inventory_manager']);
+      // Farm workers, managers, and admins can create transitions
+      allow create: if hasAnyRole(['admin', 'manager', 'farm_worker']);
 
       // No one can update transitions (audit trail)
       allow update: if false;
@@ -173,8 +174,8 @@ service cloud.firestore {
       // All authenticated users can read product info
       allow read: if isAuthenticated();
 
-      // Inventory managers and admins can manage product info
-      allow create, update: if hasAnyRole(['admin', 'inventory_manager']);
+      // Managers and admins can manage product info
+      allow create, update: if hasAnyRole(['admin', 'manager']);
 
       // Only admins can delete product info
       allow delete: if isAdmin();

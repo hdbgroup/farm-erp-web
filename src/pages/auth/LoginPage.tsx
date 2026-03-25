@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
-import { initRecaptchaVerifier, sendOTP } from '@/lib/dataProvider'
+import { initRecaptchaVerifier, sendOTP, isPhoneNumberRegistered } from '@/lib/dataProvider'
 import { USE_MOCK_DATA } from '@/lib/config'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -33,6 +33,15 @@ export const LoginPage = () => {
     setError('')
 
     try {
+      // Check if phone number is registered
+      const isRegistered = await isPhoneNumberRegistered(phoneNumber)
+
+      if (!isRegistered) {
+        setError('This phone number is not registered. Please contact your administrator.')
+        setLoading(false)
+        return
+      }
+
       const recaptchaVerifier = initRecaptchaVerifier('recaptcha-container')
       const confirmationResult = await sendOTP(phoneNumber, recaptchaVerifier as any)
 
@@ -96,7 +105,6 @@ export const LoginPage = () => {
             <span className="text-3xl">🌱</span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Farm ERP</h1>
-          <p className="text-gray-600">Modern farm management system</p>
         </div>
 
         <Card className="w-full shadow-xl border-0 bg-white/80 backdrop-blur-sm">

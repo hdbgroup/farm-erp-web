@@ -7,7 +7,8 @@ import { Label } from '@/components/ui/label'
 import { InfoCard } from '@/components/ui/info-card'
 import { firestoreHelpers, COLLECTIONS } from '@/lib/dataProvider'
 import { useAuth } from '@/contexts/AuthContext'
-import type { Employee, UserRole, EmployeeStatus } from '@/types'
+import { toDateInputValue, toTimestamp } from '@/lib/dateHelpers'
+import type { User, UserRole, UserStatus } from '@/types'
 
 export const TeamDetailPage = () => {
   const { id } = useParams<{ id: string }>()
@@ -19,11 +20,11 @@ export const TeamDetailPage = () => {
   const [saving, setSaving] = useState(false)
 
   // Form state
-  const [fullName, setFullName] = useState('')
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
   const [role, setRole] = useState<UserRole>('farm_worker')
-  const [status, setStatus] = useState<EmployeeStatus>('active')
+  const [status, setStatus] = useState<UserStatus>('active')
   const [hireDate, setHireDate] = useState(new Date().toISOString().split('T')[0])
 
   // Profile fields
@@ -40,21 +41,21 @@ export const TeamDetailPage = () => {
 
   const loadEmployee = async (employeeId: string) => {
     try {
-      const data = await firestoreHelpers.getDocument<Employee>(
-        COLLECTIONS.EMPLOYEES,
+      const data = await firestoreHelpers.getDocument<User>(
+        COLLECTIONS.USERS,
         employeeId
       )
       if (data) {
-        setFullName(data.fullName)
-        setEmail(data.email)
-        setPhone(data.phone)
+        setName(data.name)
+        setEmail(data.email || '')
+        setPhoneNumber(data.phoneNumber)
         setRole(data.role)
-        setStatus(data.status)
-        setHireDate(new Date(data.hireDate).toISOString().split('T')[0])
+        setStatus(data.status || 'active')
+        setHireDate(toDateInputValue(data.hireDate))
 
         if (data.profile) {
           setAddress(data.profile.address || '')
-          setDob(data.profile.dob ? new Date(data.profile.dob).toISOString().split('T')[0] : '')
+          setDob(toDateInputValue(data.profile.dob))
           setEmergencyContactName(data.profile.emergencyContactName || '')
           setEmergencyContactPhone(data.profile.emergencyContactPhone || '')
         }
@@ -71,36 +72,36 @@ export const TeamDetailPage = () => {
     setSaving(true)
 
     try {
-      const employeeData: Partial<Employee> = {
-        fullName,
-        email,
-        phone,
+      const userData: any = {
+        name,
+        phoneNumber,
+        email: email || undefined,
         role,
         status,
-        hireDate: new Date(hireDate),
+        hireDate: toTimestamp(hireDate),
         profile: {
           address: address || undefined,
-          dob: dob ? new Date(dob) : undefined,
+          dob: toTimestamp(dob),
           emergencyContactName: emergencyContactName || undefined,
           emergencyContactPhone: emergencyContactPhone || undefined,
         },
-        updatedAt: new Date(),
+        updatedAt: toTimestamp(new Date()),
       }
 
       if (isNew) {
-        await firestoreHelpers.addDocument(COLLECTIONS.EMPLOYEES, {
-          ...employeeData,
-          createdAt: new Date(),
+        await firestoreHelpers.addDocument(COLLECTIONS.USERS, {
+          ...userData,
+          createdAt: toTimestamp(new Date()),
           createdBy: user?.id || 'system',
         })
       } else if (id) {
-        await firestoreHelpers.updateDocument(COLLECTIONS.EMPLOYEES, id, employeeData)
+        await firestoreHelpers.updateDocument(COLLECTIONS.USERS, id, userData)
       }
 
       navigate('/team')
     } catch (error) {
-      console.error('Failed to save employee:', error)
-      alert('Failed to save employee. Please try again.')
+      console.error('Failed to save user:', error)
+      alert('Failed to save team member. Please try again.')
     } finally {
       setSaving(false)
     }
@@ -139,6 +140,14 @@ export const TeamDetailPage = () => {
         <p className="text-green-100">
           {isNew ? 'Add a new member to your farm team' : 'Update team member information'}
         </p>
+        {isNew && (
+          <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+            <p className="text-sm text-white/90">
+              ℹ️ After adding a team member, they can log in using their phone number.
+              Firebase will send them an OTP code for verification on their first login.
+            </p>
+          </div>
+        )}
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -146,36 +155,35 @@ export const TeamDetailPage = () => {
         <InfoCard title="Basic Information">
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="fullName">Full Name *</Label>
+              <Label htmlFor="name">Full Name *</Label>
               <Input
-                id="fullName"
+                id="name"
                 type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 required
                 placeholder="John Smith"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email *</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
                 placeholder="john@example.com"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone *</Label>
+              <Label htmlFor="phoneNumber">Phone Number *</Label>
               <Input
-                id="phone"
+                id="phoneNumber"
                 type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
                 required
                 placeholder="+15551234567"
               />
@@ -202,9 +210,10 @@ export const TeamDetailPage = () => {
                 required
               >
                 <option value="admin">Admin</option>
+                <option value="manager">Manager</option>
                 <option value="farm_worker">Farm Worker</option>
-                <option value="inventory_manager">Inventory Manager</option>
-                <option value="packing_staff">Packing Staff</option>
+                <option value="logistics">Logistics</option>
+                <option value="accounts">Accounts</option>
               </select>
             </div>
 
@@ -213,7 +222,7 @@ export const TeamDetailPage = () => {
               <select
                 id="status"
                 value={status}
-                onChange={(e) => setStatus(e.target.value as EmployeeStatus)}
+                onChange={(e) => setStatus(e.target.value as UserStatus)}
                 className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
                 required
               >

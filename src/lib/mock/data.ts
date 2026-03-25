@@ -1,6 +1,5 @@
 import type {
   User,
-  Employee,
   InventoryItem,
   Zone,
   Order,
@@ -17,7 +16,7 @@ import type {
  * Use this for development when Firebase services aren't available.
  */
 
-// Mock Users
+// Mock Users (also serves as team members/employees)
 export const mockUsers: User[] = [
   {
     id: 'user-admin-001',
@@ -25,46 +24,6 @@ export const mockUsers: User[] = [
     name: 'John Smith',
     role: 'admin',
     email: 'john@farmexample.com',
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-03-20'),
-  },
-  {
-    id: 'user-worker-001',
-    phoneNumber: '+15551234568',
-    name: 'Maria Garcia',
-    role: 'farm_worker',
-    email: 'maria@farmexample.com',
-    createdAt: new Date('2024-02-01'),
-    updatedAt: new Date('2024-03-15'),
-  },
-  {
-    id: 'user-manager-001',
-    phoneNumber: '+15551234569',
-    name: 'David Chen',
-    role: 'inventory_manager',
-    email: 'david@farmexample.com',
-    createdAt: new Date('2024-01-20'),
-    updatedAt: new Date('2024-03-18'),
-  },
-  {
-    id: 'user-packing-001',
-    phoneNumber: '+15551234570',
-    name: 'Sarah Johnson',
-    role: 'packing_staff',
-    email: 'sarah@farmexample.com',
-    createdAt: new Date('2024-02-15'),
-    updatedAt: new Date('2024-03-10'),
-  },
-]
-
-// Mock Employees
-export const mockEmployees: Employee[] = [
-  {
-    id: 'emp-001',
-    fullName: 'John Smith',
-    email: 'john@farmexample.com',
-    phone: '+15551234567',
-    role: 'admin',
     status: 'active',
     hireDate: new Date('2024-01-15'),
     profile: {
@@ -78,11 +37,11 @@ export const mockEmployees: Employee[] = [
     createdBy: 'system',
   },
   {
-    id: 'emp-002',
-    fullName: 'Maria Garcia',
-    email: 'maria@farmexample.com',
-    phone: '+15551234568',
+    id: 'user-worker-001',
+    phoneNumber: '+15551234568',
+    name: 'Maria Garcia',
     role: 'farm_worker',
+    email: 'maria@farmexample.com',
     status: 'active',
     hireDate: new Date('2024-02-01'),
     profile: {
@@ -103,11 +62,11 @@ export const mockEmployees: Employee[] = [
     createdBy: 'user-admin-001',
   },
   {
-    id: 'emp-003',
-    fullName: 'David Chen',
+    id: 'user-manager-001',
+    phoneNumber: '+15551234569',
+    name: 'David Chen',
+    role: 'manager',
     email: 'david@farmexample.com',
-    phone: '+15551234569',
-    role: 'inventory_manager',
     status: 'active',
     hireDate: new Date('2024-01-20'),
     profile: {
@@ -121,11 +80,11 @@ export const mockEmployees: Employee[] = [
     createdBy: 'user-admin-001',
   },
   {
-    id: 'emp-004',
-    fullName: 'Sarah Johnson',
+    id: 'user-logistics-001',
+    phoneNumber: '+15551234570',
+    name: 'Sarah Johnson',
+    role: 'logistics',
     email: 'sarah@farmexample.com',
-    phone: '+15551234570',
-    role: 'packing_staff',
     status: 'active',
     hireDate: new Date('2024-02-15'),
     profile: {
@@ -139,11 +98,29 @@ export const mockEmployees: Employee[] = [
     createdBy: 'user-admin-001',
   },
   {
-    id: 'emp-005',
-    fullName: 'Robert Martinez',
-    email: 'robert@farmexample.com',
-    phone: '+15551234571',
+    id: 'user-accounts-001',
+    phoneNumber: '+15551234571',
+    name: 'Michael Brown',
+    role: 'accounts',
+    email: 'michael@farmexample.com',
+    status: 'active',
+    hireDate: new Date('2024-02-20'),
+    profile: {
+      address: '987 Maple Lane, Rural Valley, CA 95001',
+      dob: new Date('1987-09-10'),
+      emergencyContactName: 'Lisa Brown',
+      emergencyContactPhone: '+15559876548',
+    },
+    createdAt: new Date('2024-02-20'),
+    updatedAt: new Date('2024-03-12'),
+    createdBy: 'user-admin-001',
+  },
+  {
+    id: 'user-worker-002',
+    phoneNumber: '+15551234572',
+    name: 'Robert Martinez',
     role: 'farm_worker',
+    email: 'robert@farmexample.com',
     status: 'on_leave',
     hireDate: new Date('2023-11-01'),
     profile: {
@@ -582,7 +559,6 @@ export const mockStageTransitions: StageTransition[] = [
 // Mock data store (acts like an in-memory database)
 export const mockDatabase = {
   users: new Map(mockUsers.map((u) => [u.id, u])),
-  employees: new Map(mockEmployees.map((e) => [e.id, e])),
   inventory: new Map(mockInventory.map((i) => [i.id, i])),
   zones: new Map(mockZones.map((z) => [z.id, z])),
   orders: new Map(mockOrders.map((o) => [o.id, o])),
@@ -595,7 +571,6 @@ export const mockDatabase = {
 // Helper to reset mock data
 export const resetMockData = () => {
   mockDatabase.users = new Map(mockUsers.map((u) => [u.id, u]))
-  mockDatabase.employees = new Map(mockEmployees.map((e) => [e.id, e]))
   mockDatabase.inventory = new Map(mockInventory.map((i) => [i.id, i]))
   mockDatabase.zones = new Map(mockZones.map((z) => [z.id, z]))
   mockDatabase.orders = new Map(mockOrders.map((o) => [o.id, o]))
