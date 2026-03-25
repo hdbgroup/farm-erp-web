@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { StatCard } from '@/components/ui/stat-card'
 import { useAuth } from '@/contexts/AuthContext'
 import { firestoreHelpers, COLLECTIONS } from '@/lib/dataProvider'
 import type { InventoryItem, Order } from '@/types'
 
 export const DashboardPage = () => {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [inventory, setInventory] = useState<InventoryItem[]>([])
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
@@ -56,74 +60,56 @@ export const DashboardPage = () => {
 
       {/* Stats Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow bg-gradient-to-br from-white to-green-50">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Total Inventory
-            </CardTitle>
-            <div className="text-2xl">📦</div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-green-700">
-              {loading ? '...' : stats.totalInventory}
-            </div>
-            <p className="text-xs text-gray-500 mt-1">items in stock</p>
-          </CardContent>
-        </Card>
+        <StatCard
+          title="Total Inventory"
+          value={loading ? '...' : stats.totalInventory}
+          subtitle="items in stock"
+          icon="📦"
+          variant="green"
+        />
 
-        <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow bg-gradient-to-br from-white to-emerald-50">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Active Growth
-            </CardTitle>
-            <div className="text-2xl">🌿</div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-emerald-700">
-              {loading ? '...' : stats.activeGrowth}
-            </div>
-            <p className="text-xs text-gray-500 mt-1">items growing</p>
-          </CardContent>
-        </Card>
+        <StatCard
+          title="Active Growth"
+          value={loading ? '...' : stats.activeGrowth}
+          subtitle="items growing"
+          icon="🌿"
+          variant="emerald"
+        />
 
-        <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow bg-gradient-to-br from-white to-green-50">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Ready for Sale
-            </CardTitle>
-            <div className="text-2xl">✅</div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-green-700">
-              {loading ? '...' : stats.readyForSale}
-            </div>
-            <p className="text-xs text-gray-500 mt-1">items available</p>
-          </CardContent>
-        </Card>
+        <StatCard
+          title="Ready for Sale"
+          value={loading ? '...' : stats.readyForSale}
+          subtitle="items available"
+          icon="✅"
+          variant="green"
+        />
 
-        <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow bg-gradient-to-br from-white to-emerald-50">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Pending Orders
-            </CardTitle>
-            <div className="text-2xl">🛒</div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-emerald-700">
-              {loading ? '...' : stats.pendingOrders}
-            </div>
-            <p className="text-xs text-gray-500 mt-1">orders to fulfill</p>
-          </CardContent>
-        </Card>
+        <StatCard
+          title="Pending Orders"
+          value={loading ? '...' : stats.pendingOrders}
+          subtitle="orders to fulfill"
+          icon="🛒"
+          variant="emerald"
+        />
       </div>
 
       {/* Quick Overview */}
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="border-0 shadow-lg bg-white">
           <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-green-50/30 pb-4">
-            <CardTitle className="text-gray-900 font-semibold">
-              Inventory Overview
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-gray-900 font-semibold">
+                Inventory Overview
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/inventory')}
+                className="text-green-600 hover:text-green-700 hover:bg-green-50"
+              >
+                View All
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="pt-6">
             {loading ? (
@@ -137,7 +123,8 @@ export const DashboardPage = () => {
                 {inventory.slice(0, 5).map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-green-200 hover:bg-green-50/50 transition-all"
+                    onClick={() => navigate(`/inventory/${item.id}`)}
+                    className="flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-white hover:border-green-200 hover:bg-green-50/50 transition-all cursor-pointer"
                   >
                     <div className="flex-1">
                       <p className="font-medium text-sm text-gray-900">{item.name}</p>
@@ -160,9 +147,19 @@ export const DashboardPage = () => {
 
         <Card className="border-0 shadow-lg bg-white">
           <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-green-50/30 pb-4">
-            <CardTitle className="text-gray-900 font-semibold">
-              Recent Orders
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-gray-900 font-semibold">
+                Recent Orders
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/orders')}
+                className="text-green-600 hover:text-green-700 hover:bg-green-50"
+              >
+                View All
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="pt-6">
             {loading ? (
@@ -176,7 +173,8 @@ export const DashboardPage = () => {
                 {orders.slice(0, 5).map((order) => (
                   <div
                     key={order.id}
-                    className="flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-green-200 hover:bg-green-50/50 transition-all"
+                    onClick={() => navigate(`/orders/${order.id}`)}
+                    className="flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-white hover:border-green-200 hover:bg-green-50/50 transition-all cursor-pointer"
                   >
                     <div className="flex-1">
                       <p className="font-medium text-sm text-gray-900">

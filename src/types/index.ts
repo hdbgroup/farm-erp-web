@@ -100,6 +100,38 @@ export interface ItemProcessingRecord {
 }
 
 // Team/Activity Types
+export type EmployeeStatus = 'active' | 'inactive' | 'on_leave' | 'terminated'
+
+export interface License {
+  type: string
+  number: string
+  expiry: Date
+}
+
+export interface EmployeeProfile {
+  address?: string
+  dob?: Date
+  emergencyContactName?: string
+  emergencyContactPhone?: string
+  licenses?: License[]
+}
+
+export interface Employee {
+  id: string
+  fullName: string
+  email: string
+  phone: string
+  role: UserRole
+  status: EmployeeStatus
+  hireDate: Date
+  profile?: EmployeeProfile
+  assignedTasks?: string[]
+  createdAt: Date
+  updatedAt: Date
+  createdBy: string
+}
+
+// Legacy - keeping for backwards compatibility
 export interface TeamMember extends User {
   assignedTasks: string[]
   activityLog: ActivityLog[]

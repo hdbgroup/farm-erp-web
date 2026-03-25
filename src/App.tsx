@@ -5,9 +5,12 @@ import { MainLayout } from './components/layout/MainLayout'
 import { LoginPage } from './pages/auth/LoginPage'
 import { DashboardPage } from './pages/dashboard/DashboardPage'
 import { InventoryPage } from './pages/inventory/InventoryPage'
+import { InventoryDetailPage } from './pages/inventory/InventoryDetailPage'
 import { ZonesPage } from './pages/zones/ZonesPage'
 import { TeamPage } from './pages/team/TeamPage'
+import { TeamDetailPage } from './pages/team/TeamDetailPage'
 import { OrdersPage } from './pages/orders/OrdersPage'
+import { OrderDetailPage } from './pages/orders/OrderDetailPage'
 
 function App() {
   return (
@@ -29,9 +32,12 @@ function App() {
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="inventory" element={<InventoryPage />} />
+            <Route path="inventory/:id" element={<InventoryDetailPage />} />
             <Route path="zones" element={<ZonesPage />} />
             <Route path="team" element={<TeamPage />} />
+            <Route path="team/:id" element={<TeamDetailPage />} />
             <Route path="orders" element={<OrdersPage />} />
+            <Route path="orders/:id" element={<OrderDetailPage />} />
           </Route>
 
           {/* Catch all */}

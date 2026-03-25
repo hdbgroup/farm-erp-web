@@ -1,5 +1,6 @@
 import type {
   User,
+  Employee,
   InventoryItem,
   Zone,
   Order,
@@ -53,6 +54,114 @@ export const mockUsers: User[] = [
     email: 'sarah@farmexample.com',
     createdAt: new Date('2024-02-15'),
     updatedAt: new Date('2024-03-10'),
+  },
+]
+
+// Mock Employees
+export const mockEmployees: Employee[] = [
+  {
+    id: 'emp-001',
+    fullName: 'John Smith',
+    email: 'john@farmexample.com',
+    phone: '+15551234567',
+    role: 'admin',
+    status: 'active',
+    hireDate: new Date('2024-01-15'),
+    profile: {
+      address: '123 Farm Road, Rural Valley, CA 95001',
+      dob: new Date('1985-05-15'),
+      emergencyContactName: 'Jane Smith',
+      emergencyContactPhone: '+15559876543',
+    },
+    createdAt: new Date('2024-01-15'),
+    updatedAt: new Date('2024-03-20'),
+    createdBy: 'system',
+  },
+  {
+    id: 'emp-002',
+    fullName: 'Maria Garcia',
+    email: 'maria@farmexample.com',
+    phone: '+15551234568',
+    role: 'farm_worker',
+    status: 'active',
+    hireDate: new Date('2024-02-01'),
+    profile: {
+      address: '456 Valley Street, Rural Valley, CA 95001',
+      dob: new Date('1990-08-20'),
+      emergencyContactName: 'Carlos Garcia',
+      emergencyContactPhone: '+15559876544',
+      licenses: [
+        {
+          type: 'Forklift License',
+          number: 'FL-12345',
+          expiry: new Date('2025-06-30'),
+        },
+      ],
+    },
+    createdAt: new Date('2024-02-01'),
+    updatedAt: new Date('2024-03-15'),
+    createdBy: 'user-admin-001',
+  },
+  {
+    id: 'emp-003',
+    fullName: 'David Chen',
+    email: 'david@farmexample.com',
+    phone: '+15551234569',
+    role: 'inventory_manager',
+    status: 'active',
+    hireDate: new Date('2024-01-20'),
+    profile: {
+      address: '789 Hill Drive, Rural Valley, CA 95001',
+      dob: new Date('1988-03-12'),
+      emergencyContactName: 'Linda Chen',
+      emergencyContactPhone: '+15559876545',
+    },
+    createdAt: new Date('2024-01-20'),
+    updatedAt: new Date('2024-03-18'),
+    createdBy: 'user-admin-001',
+  },
+  {
+    id: 'emp-004',
+    fullName: 'Sarah Johnson',
+    email: 'sarah@farmexample.com',
+    phone: '+15551234570',
+    role: 'packing_staff',
+    status: 'active',
+    hireDate: new Date('2024-02-15'),
+    profile: {
+      address: '321 Oak Avenue, Rural Valley, CA 95001',
+      dob: new Date('1995-11-30'),
+      emergencyContactName: 'Mike Johnson',
+      emergencyContactPhone: '+15559876546',
+    },
+    createdAt: new Date('2024-02-15'),
+    updatedAt: new Date('2024-03-10'),
+    createdBy: 'user-admin-001',
+  },
+  {
+    id: 'emp-005',
+    fullName: 'Robert Martinez',
+    email: 'robert@farmexample.com',
+    phone: '+15551234571',
+    role: 'farm_worker',
+    status: 'on_leave',
+    hireDate: new Date('2023-11-01'),
+    profile: {
+      address: '654 Pine Street, Rural Valley, CA 95001',
+      dob: new Date('1992-07-22'),
+      emergencyContactName: 'Ana Martinez',
+      emergencyContactPhone: '+15559876547',
+      licenses: [
+        {
+          type: 'Pesticide Applicator License',
+          number: 'PA-98765',
+          expiry: new Date('2024-12-31'),
+        },
+      ],
+    },
+    createdAt: new Date('2023-11-01'),
+    updatedAt: new Date('2024-03-25'),
+    createdBy: 'user-admin-001',
   },
 ]
 
@@ -473,6 +582,7 @@ export const mockStageTransitions: StageTransition[] = [
 // Mock data store (acts like an in-memory database)
 export const mockDatabase = {
   users: new Map(mockUsers.map((u) => [u.id, u])),
+  employees: new Map(mockEmployees.map((e) => [e.id, e])),
   inventory: new Map(mockInventory.map((i) => [i.id, i])),
   zones: new Map(mockZones.map((z) => [z.id, z])),
   orders: new Map(mockOrders.map((o) => [o.id, o])),
@@ -485,6 +595,7 @@ export const mockDatabase = {
 // Helper to reset mock data
 export const resetMockData = () => {
   mockDatabase.users = new Map(mockUsers.map((u) => [u.id, u]))
+  mockDatabase.employees = new Map(mockEmployees.map((e) => [e.id, e]))
   mockDatabase.inventory = new Map(mockInventory.map((i) => [i.id, i]))
   mockDatabase.zones = new Map(mockZones.map((z) => [z.id, z]))
   mockDatabase.orders = new Map(mockOrders.map((o) => [o.id, o]))

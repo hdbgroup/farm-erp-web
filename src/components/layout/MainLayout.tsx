@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation, Outlet } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
+import { Breadcrumbs } from '@/components/ui/breadcrumbs'
 import { cn } from '@/lib/utils'
 
 const navigation = [
@@ -56,7 +57,7 @@ export const MainLayout = () => {
           <div className="flex-1 flex flex-col overflow-y-auto">
             <nav className="flex-1 px-4 py-6 space-y-2">
               {navigation.map((item) => {
-                const isActive = location.pathname === item.href
+                const isActive = location.pathname === item.href || location.pathname.startsWith(item.href + '/')
                 return (
                   <Link
                     key={item.name}
@@ -134,9 +135,7 @@ export const MainLayout = () => {
               </svg>
             </button>
 
-            <h2 className="text-lg font-semibold text-gray-800">
-              {navigation.find((item) => item.href === location.pathname)?.name || 'Dashboard'}
-            </h2>
+            <Breadcrumbs />
 
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>

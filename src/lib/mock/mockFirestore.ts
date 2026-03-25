@@ -9,6 +9,7 @@ import { mockDatabase } from './data'
 // Collection names (same as real Firestore)
 export const COLLECTIONS = {
   USERS: 'users',
+  EMPLOYEES: 'employees',
   INVENTORY: 'inventory',
   ZONES: 'zones',
   ORDERS: 'orders',
@@ -33,6 +34,8 @@ const getCollection = (collectionName: string): Map<string, any> => {
   switch (collectionName) {
     case COLLECTIONS.USERS:
       return mockDatabase.users
+    case COLLECTIONS.EMPLOYEES:
+      return mockDatabase.employees
     case COLLECTIONS.INVENTORY:
       return mockDatabase.inventory
     case COLLECTIONS.ZONES:

@@ -75,6 +75,7 @@ farm-erp-web/
 ├── storage.rules        # Cloud Storage security rules
 ├── FIREBASE_SETUP.md    # Firebase setup instructions
 ├── MOCK_DATA_GUIDE.md   # Mock data development guide
+├── DEVELOPMENT.md       # 📘 Development guidelines & DRY principle
 ├── DEPLOYMENT.md        # Deployment guide
 └── README.md            # This file
 ```
@@ -208,9 +209,19 @@ See [MOCK_DATA_GUIDE.md](./MOCK_DATA_GUIDE.md) for complete details.
 - `npm run deploy:firestore` - Deploy Firestore rules and indexes
 - `npm run emulators` - Start Firebase emulators for local testing
 
-### Code Style
+### Code Style & Best Practices
 
-This project uses:
+This project follows strict coding standards to ensure maintainability and consistency.
+
+**📘 Read [DEVELOPMENT.md](./DEVELOPMENT.md) for complete development guidelines**
+
+Key principles:
+- **DRY (Don't Repeat Yourself)** - Always create reusable components instead of duplicating code
+- **Consistent Color System** - Use explicit colors from the approved palette
+- **Component Composition** - Build on existing components before creating new ones
+- **Type Safety** - All code must be properly typed with TypeScript
+
+Tools:
 - ESLint for code quality
 - Prettier for code formatting (configured in `.prettierrc`)
 - TypeScript strict mode for type safety
