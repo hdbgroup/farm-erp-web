@@ -11,6 +11,7 @@ import { TeamPage } from './pages/team/TeamPage'
 import { TeamDetailPage } from './pages/team/TeamDetailPage'
 import { OrdersPage } from './pages/orders/OrdersPage'
 import { OrderDetailPage } from './pages/orders/OrderDetailPage'
+import { SeedDataPage } from './pages/SeedDataPage'
 
 function App() {
   return (
@@ -19,6 +20,16 @@ function App() {
         <Routes>
           {/* Public routes */}
           <Route path="/login" element={<LoginPage />} />
+
+          {/* Dev tools - remove before production */}
+          <Route
+            path="/seed-data"
+            element={
+              <ProtectedRoute>
+                <SeedDataPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Protected routes */}
           <Route
