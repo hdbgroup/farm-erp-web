@@ -5,19 +5,23 @@ import {
   onAuthStateChanged,
 } from 'firebase/auth'
 import type { ConfirmationResult, User as FirebaseUser } from 'firebase/auth'
-import { auth, db } from './firebase'
-import { doc, getDoc, setDoc, serverTimestamp, query, collection, where, getDocs } from 'firebase/firestore'
+import { httpsCallable } from 'firebase/functions'
+import { auth, db, functions } from './firebase'
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
 import type { User, UserRole } from '@/types'
 import { COLLECTIONS } from './firestore'
 import { toDate } from './dateHelpers'
 
-// Check if phone number is registered in Firestore
+// Check if phone number is registered in Firestore using Cloud Function
 export const isPhoneNumberRegistered = async (phoneNumber: string): Promise<boolean> => {
   try {
-    const usersRef = collection(db, COLLECTIONS.USERS)
-    const q = query(usersRef, where('phoneNumber', '==', phoneNumber))
-    const querySnapshot = await getDocs(q)
-    return !querySnapshot.empty
+    const checkPhoneNumberRegistered = httpsCallable<
+      { phoneNumber: string },
+      { isRegistered: boolean }
+    >(functions, 'checkPhoneNumberRegistered')
+
+    const result = await checkPhoneNumberRegistered({ phoneNumber })
+    return result.data.isRegistered
   } catch (error) {
     console.error('Error checking phone number:', error)
     return false
