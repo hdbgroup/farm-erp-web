@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import type { User } from '@/types'
-import { observeAuthState, getUserProfile, createUserProfile, signOut } from '@/lib/dataProvider'
-import { toTimestamp } from '@/lib/dateHelpers'
+import { observeAuthState, getUserProfile, signOut } from '@/lib/dataProvider'
 
 interface AuthContextType {
   firebaseUser: any | null // Can be Firebase user or mock user

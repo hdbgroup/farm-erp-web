@@ -10,29 +10,52 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { useAuth } from '@/contexts/AuthContext'
 import { seedInventoryItems } from '@/lib/seedInventory'
+import { seedLandingPageData } from '@/lib/seedLandingPageData'
 
 export const SeedDataPage = () => {
   const { user } = useAuth()
-  const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const [loadingInventory, setLoadingInventory] = useState(false)
+  const [loadingLandingPages, setLoadingLandingPages] = useState(false)
+  const [inventoryResult, setInventoryResult] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const [landingPageResult, setLandingPageResult] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   const handleSeedInventory = async () => {
-    setLoading(true)
-    setResult(null)
+    setLoadingInventory(true)
+    setInventoryResult(null)
 
     try {
       const itemIds = await seedInventoryItems(user?.id || 'system')
-      setResult({
+      setInventoryResult({
         type: 'success',
         message: `✅ Successfully seeded ${itemIds.length} inventory items!`,
       })
     } catch (error: any) {
-      setResult({
+      setInventoryResult({
         type: 'error',
         message: `❌ Error: ${error.message}`,
       })
     } finally {
-      setLoading(false)
+      setLoadingInventory(false)
+    }
+  }
+
+  const handleSeedLandingPages = async () => {
+    setLoadingLandingPages(true)
+    setLandingPageResult(null)
+
+    try {
+      const results = await seedLandingPageData(user?.id || 'system')
+      setLandingPageResult({
+        type: 'success',
+        message: `✅ Successfully seeded ${results.success.length} landing pages!${results.errors.length > 0 ? ` (${results.errors.length} errors)` : ''}`,
+      })
+    } catch (error: any) {
+      setLandingPageResult({
+        type: 'error',
+        message: `❌ Error: ${error.message}`,
+      })
+    } finally {
+      setLoadingLandingPages(false)
     }
   }
 
@@ -61,6 +84,50 @@ export const SeedDataPage = () => {
           </CardContent>
         </Card>
 
+        {/* Landing Pages Seed */}
+        <Card className="border-0 shadow-lg bg-white">
+          <CardContent className="pt-6 space-y-4">
+            <div>
+              <h3 className="font-semibold text-lg text-gray-900 mb-2">Landing Page Content</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Seeds CMS content for landing pages:
+              </p>
+              <ul className="text-sm text-gray-600 space-y-1 ml-4 list-disc">
+                <li>Home page with hero, about, and parallax sections</li>
+                <li>About Us page</li>
+                <li>Lilly Pilly Products page</li>
+                <li>Contact page</li>
+              </ul>
+            </div>
+
+            <Button
+              onClick={handleSeedLandingPages}
+              disabled={loadingLandingPages}
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              {loadingLandingPages ? 'Seeding...' : '🌐 Seed Landing Pages'}
+            </Button>
+
+            {landingPageResult && (
+              <div
+                className={`rounded-lg p-4 ${
+                  landingPageResult.type === 'success'
+                    ? 'bg-green-50 border border-green-200'
+                    : 'bg-red-50 border border-red-200'
+                }`}
+              >
+                <p
+                  className={`text-sm ${
+                    landingPageResult.type === 'success' ? 'text-green-800' : 'text-red-800'
+                  }`}
+                >
+                  {landingPageResult.message}
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Inventory Seed */}
         <Card className="border-0 shadow-lg bg-white">
           <CardContent className="pt-6 space-y-4">
@@ -78,26 +145,26 @@ export const SeedDataPage = () => {
 
             <Button
               onClick={handleSeedInventory}
-              disabled={loading}
+              disabled={loadingInventory}
               className="w-full bg-green-600 hover:bg-green-700 text-white"
             >
-              {loading ? 'Seeding...' : '🌱 Seed Inventory Items'}
+              {loadingInventory ? 'Seeding...' : '🌱 Seed Inventory Items'}
             </Button>
 
-            {result && (
+            {inventoryResult && (
               <div
                 className={`rounded-lg p-4 ${
-                  result.type === 'success'
+                  inventoryResult.type === 'success'
                     ? 'bg-green-50 border border-green-200'
                     : 'bg-red-50 border border-red-200'
                 }`}
               >
                 <p
                   className={`text-sm ${
-                    result.type === 'success' ? 'text-green-800' : 'text-red-800'
+                    inventoryResult.type === 'success' ? 'text-green-800' : 'text-red-800'
                   }`}
                 >
-                  {result.message}
+                  {inventoryResult.message}
                 </p>
               </div>
             )}

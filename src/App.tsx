@@ -12,6 +12,7 @@ import { TeamDetailPage } from './pages/team/TeamDetailPage'
 import { OrdersPage } from './pages/orders/OrdersPage'
 import { OrderDetailPage } from './pages/orders/OrderDetailPage'
 import { SeedDataPage } from './pages/SeedDataPage'
+import { CmsWebsitePageV3 } from './pages/cms-website/CmsWebsitePageV3'
 
 function App() {
   return (
@@ -49,6 +50,8 @@ function App() {
             <Route path="team/:id" element={<TeamDetailPage />} />
             <Route path="orders" element={<OrdersPage />} />
             <Route path="orders/:id" element={<OrderDetailPage />} />
+            <Route path="cms-website" element={<CmsWebsitePageV3 />} />
+            <Route path="cms-website/:pageSlug" element={<CmsWebsitePageV3 />} />
           </Route>
 
           {/* Catch all */}

@@ -15,7 +15,7 @@
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from './card'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 interface InfoCardProps {
   title: string

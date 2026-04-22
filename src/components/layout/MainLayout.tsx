@@ -11,6 +11,7 @@ const navigation = [
   { name: 'Zones', href: '/zones' },
   { name: 'Team', href: '/team' },
   { name: 'Orders', href: '/orders' },
+  { name: 'CMS Website', href: '/cms-website' },
 ]
 
 export const MainLayout = () => {

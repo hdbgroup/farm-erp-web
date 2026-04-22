@@ -34,6 +34,9 @@ export const COLLECTIONS = {
   NOTIFICATIONS: 'notifications',
   STAGE_TRANSITIONS: 'stage_transitions',
   PRODUCT_INFO: 'product_info',
+  // Landing Page CMS
+  LANDING_PAGE_CONTENT: 'landing_page_content',
+  LANDING_PAGE_MEDIA: 'landing_page_media',
 } as const
 
 // Helper to convert Firestore timestamp to Date (re-exported from dateHelpers)
@@ -52,7 +55,9 @@ export const firestoreHelpers = {
     const docRef = doc(db, collectionName, id)
     const docSnap = await getDoc(docRef)
     if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() } as T
+      const data = docSnap.data()
+      delete data.id // Remove id field from data to prevent overwriting docSnap.id
+      return { id: docSnap.id, ...data } as T
     }
     return null
   },
@@ -65,7 +70,11 @@ export const firestoreHelpers = {
     const collectionRef = collection(db, collectionName)
     const q = query(collectionRef, ...constraints)
     const querySnapshot = await getDocs(q)
-    return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as T))
+    return querySnapshot.docs.map((doc) => {
+      const data = doc.data()
+      delete data.id // Remove id field from data to prevent overwriting doc.id
+      return { id: doc.id, ...data } as T
+    })
   },
 
   // Add a new document
@@ -74,8 +83,10 @@ export const firestoreHelpers = {
     data: T
   ): Promise<string> {
     const collectionRef = collection(db, collectionName)
+    const cleanData = { ...data }
+    delete cleanData.id // Never save id as a field
     const docRef = await addDoc(collectionRef, {
-      ...data,
+      ...cleanData,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     })
@@ -89,8 +100,10 @@ export const firestoreHelpers = {
     data: T
   ): Promise<void> {
     const docRef = doc(db, collectionName, id)
+    const cleanData = { ...data }
+    delete cleanData.id // Never save id as a field
     await updateDoc(docRef, {
-      ...data,
+      ...cleanData,
       updatedAt: serverTimestamp(),
     })
   },

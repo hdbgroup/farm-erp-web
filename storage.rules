@@ -123,6 +123,23 @@ service firebase.storage {
     }
 
     // ============================================
+    // Landing Page Images (CMS)
+    // ============================================
+
+    match /landing-page-images/{pageSlug}/{fileName} {
+      // Anyone can read landing page images (public)
+      allow read: if true;
+
+      // Only admins can upload/update landing page images
+      allow create, update: if isAdmin() &&
+                               isImage() &&
+                               isValidSize();
+
+      // Only admins can delete landing page images
+      allow delete: if isAdmin();
+    }
+
+    // ============================================
     // Temporary Uploads
     // ============================================
 

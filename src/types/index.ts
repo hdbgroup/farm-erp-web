@@ -232,3 +232,57 @@ export interface DashboardStats {
 export interface RecentActivity extends ActivityLog {
   urgent: boolean
 }
+
+// Landing Page CMS Types
+export type LandingPageSlug =
+  | 'home'
+  | 'about'
+  | 'products-lilly-pilly'
+  | 'products-other-natives'
+  | 'products-exotics'
+  | 'products-palms'
+  | 'availability'
+  | 'delivery'
+  | 'councils'
+  | 'pricing'
+  | 'visit-us'
+  | 'contact'
+
+export interface LandingPageSection {
+  id: string
+  sectionKey: string // e.g., 'hero', 'about', 'features'
+  title?: string
+  subtitle?: string
+  content?: string
+  imageUrl?: string
+  imagePath?: string // Firebase Storage path
+  visible: boolean
+  order: number
+  metadata?: Record<string, unknown> // for custom fields like buttons, links, etc.
+}
+
+export interface LandingPageContent {
+  id: string
+  pageSlug: LandingPageSlug
+  pageTitle: string
+  metaDescription?: string
+  metaKeywords?: string
+  sections: LandingPageSection[]
+  published: boolean
+  createdAt: Date
+  updatedAt: Date
+  updatedBy: string
+}
+
+export interface LandingPageMedia {
+  id: string
+  pageSlug: LandingPageSlug
+  sectionKey: string
+  fileName: string
+  storagePath: string
+  url: string
+  alt?: string
+  caption?: string
+  uploadedAt: Date
+  uploadedBy: string
+}

@@ -6,7 +6,6 @@
 
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from './firebase'
-import type { InventoryItem } from '@/types'
 
 const sampleInventoryItems = [
   {

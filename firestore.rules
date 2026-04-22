@@ -182,6 +182,32 @@ service cloud.firestore {
     }
 
     // ============================================
+    // Landing Page CMS Collections
+    // ============================================
+
+    match /landing_page_content/{pageId} {
+      // Public read access (so landing page can fetch content)
+      allow read: if true;
+
+      // Only authenticated ERP users can create/update
+      allow create, update: if isAuthenticated();
+
+      // Only admins can delete pages
+      allow delete: if isAdmin();
+    }
+
+    match /landing_page_media/{mediaId} {
+      // Public read access (so landing page can load images)
+      allow read: if true;
+
+      // Only authenticated ERP users can upload/update media
+      allow create, update: if isAuthenticated();
+
+      // Only admins can delete media
+      allow delete: if isAdmin();
+    }
+
+    // ============================================
     // Default Deny All
     // ============================================
 
